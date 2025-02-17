@@ -20,21 +20,26 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 1
 
-      - name: Ler conteúdo do swagger.yaml
-        id: read_swagger
+      - name: Verificar e Exibir Conteúdo do Swagger.yaml
         run: |
           if [ -f "swagger.yaml" ]; then
-            SWAGGER_CONTENT=$(cat swagger.yaml | base64 -w 0)
-            echo "swagger_file=$SWAGGER_CONTENT" >> $GITHUB_ENV
+            echo "Arquivo swagger.yaml encontrado!"
+            cat swagger.yaml
           else
-            echo "swagger_file=" >> $GITHUB_ENV
             echo "Erro: Arquivo swagger.yaml não encontrado!"
             exit 1
           fi
+
+      - name: Fazer Upload do Swagger.yaml como Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: swagger-file
+          path: swagger.yaml
+          retention-days: 1
 
       - name: Acionar workflow no `repo-ci-cd`
         run: |
           curl -X POST -H "Accept: application/vnd.github.v3+json" \
             -H "Authorization: token ${{ secrets.REPO_ACCESS_TOKEN }}" \
             https://api.github.com/repos/GabrielLLR/repo-ci-cd/actions/workflows/pr-validation-and-jira.yml/dispatches \
-            -d "{\"ref\":\"main\", \"inputs\": {\"SWAGGER_FILE\": \"${{ env.swagger_file }}\"}}"
+            -d '{"ref":"main"}'
