@@ -31,7 +31,7 @@ jobs:
           fi
 
       - name: Fazer Upload do Swagger.yaml como Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4  # Atualizado para v4
         with:
           name: swagger-file
           path: swagger.yaml
