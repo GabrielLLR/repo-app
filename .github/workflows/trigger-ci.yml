@@ -12,5 +12,3 @@ on:
 jobs:
   trigger:
     uses: GabrielLLR/repo-ci-cd/.github/workflows/pr-validation-and-jira.yml@main
-    secrets:
-      REPO_ACCESS_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
