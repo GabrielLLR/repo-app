@@ -13,33 +13,19 @@ jobs:
   trigger:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout do código do PR
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ github.event.pull_request.head.repo.full_name }}
-          ref: ${{ github.event.pull_request.head.ref }}
-          fetch-depth: 1
-
-      - name: Verificar e Exibir Conteúdo do Swagger.yaml
+      - name: Construir a URL RAW do Swagger.yaml
+        id: get_raw_url
         run: |
-          if [ -f "swagger.yaml" ]; then
-            echo "Arquivo swagger.yaml encontrado!"
-            cat swagger.yaml
-          else
-            echo "Erro: Arquivo swagger.yaml não encontrado!"
-            exit 1
-          fi
+          RAW_URL="https://raw.githubusercontent.com/${{ github.event.pull_request.head.repo.full_name }}/${{ github.event.pull_request.head.ref }}/swagger.yaml"
+          echo "SWAGGER_RAW_URL=$RAW_URL" >> $GITHUB_ENV
 
-      - name: Fazer Upload do Swagger.yaml como Artifact
-        uses: actions/upload-artifact@v4  # Atualizado para v4
-        with:
-          name: swagger-file
-          path: swagger.yaml
-          retention-days: 1
+      - name: Exibir URL do Arquivo Swagger (Debug)
+        run: |
+          echo "Swagger YAML disponível em: ${{ env.SWAGGER_RAW_URL }}"
 
       - name: Acionar workflow no `repo-ci-cd`
         run: |
           curl -X POST -H "Accept: application/vnd.github.v3+json" \
             -H "Authorization: token ${{ secrets.REPO_ACCESS_TOKEN }}" \
             https://api.github.com/repos/GabrielLLR/repo-ci-cd/actions/workflows/pr-validation-and-jira.yml/dispatches \
-            -d '{"ref":"main"}'
+            -d "{\"ref\":\"main\", \"inputs\": {\"SWAGGER_FILE_URL\": \"${{ env.SWAGGER_RAW_URL }}\"}}"
