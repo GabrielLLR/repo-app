@@ -1,6 +1,11 @@
 name: Trigger CI/CD Workflow (PR de Fork)
+
 on:
   pull_request_target:
+    types:
+      - opened
+      - synchronize
+      - reopened
     branches:
       - main  # Ou outra branch alvo
 
@@ -8,6 +13,6 @@ jobs:
   trigger:
     uses: GabrielLLR/repo-ci-cd/.github/workflows/pr-validation-and-jira.yml@main
     with:
-      SWAGGER_FILE : "swagger.yaml"
+      SWAGGER_FILE: "swagger.yaml"
     secrets:
       REPO_ACCESS_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
