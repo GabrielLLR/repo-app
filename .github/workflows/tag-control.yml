@@ -4,9 +4,10 @@ on:
   pull_request:
     types:
       - closed
+
 permissions:
   contents: write  # ✅ Garante permissão para criar e excluir tags
-  
+
 jobs:
   update-tag:
     runs-on: ubuntu-latest
@@ -15,6 +16,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          persist-credentials: false  # ✅ Evita conflitos de credenciais
 
       - name: Read Swagger version
         id: swagger_version
