@@ -30,4 +30,4 @@ jobs:
           -H "Authorization: Bearer ${{ secrets.REPO_ACCESS_TOKEN }}" \
           -H "Content-Type: application/json" \
           -d "{\"ref\": \"main\", \"inputs\": {\"repository\": \"${{ github.repository }}\", \"branch\": \"${{ github.event.pull_request.base.ref }}\", \"version\": \"$VERSION\", \"title\": \"$TITLE\"}}" \
-          "https://api.github.com/repos/GabrielLLR/repo-ci-cd/actions/workflows/update-tag.yml/dispatches"
+          "https://api.github.com/repos/GabrielLLR/repo-ci-cd/actions/workflows/tag-control.yml/dispatches"
