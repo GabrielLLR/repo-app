@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Read Swagger version
         id: swagger_version
@@ -23,14 +23,18 @@ jobs:
 
       - name: Configure Git
         run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Authenticate with GitHub
+        run: |
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
 
       - name: Remove existing tag (if exists)
         run: |
           if git rev-parse refs/tags/$VERSION >/dev/null 2>&1; then
             echo "Tag $VERSION already exists. Removing..."
-            git push --delete origin $VERSION
+            git push origin --delete $VERSION
             git tag -d $VERSION
           fi
 
