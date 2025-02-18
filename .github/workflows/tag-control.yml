@@ -4,7 +4,9 @@ on:
   pull_request:
     types:
       - closed
-
+permissions:
+  contents: write  # ✅ Garante permissão para criar e excluir tags
+  
 jobs:
   update-tag:
     runs-on: ubuntu-latest
