@@ -5,9 +5,6 @@ on:
     types:
       - closed
 
-permissions:
-  contents: write  # ✅ Garante permissão para criar e excluir tags
-
 jobs:
   update-tag:
     runs-on: ubuntu-latest
@@ -16,8 +13,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-        with:
-          persist-credentials: false  # ✅ Evita conflitos de credenciais
 
       - name: Read Swagger version
         id: swagger_version
@@ -26,18 +21,25 @@ jobs:
           echo "Swagger version: $VERSION"
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-      - name: Remove existing tag (if exists)
+      - name: Remove existing tag (if exists) via API
         run: |
-          if git rev-parse refs/tags/$VERSION >/dev/null 2>&1; then
-            echo "Tag $VERSION already exists. Removing..."
-            git push origin --delete $VERSION
-            git tag -d $VERSION
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" -X DELETE -H "Authorization: token ${{ secrets.REPO_ACCESS_TOKEN }}" \
+          "https://api.github.com/repos/${{ github.repository }}/git/refs/tags/$VERSION")
+          if [ "$RESPONSE" == "204" ]; then
+            echo "Tag $VERSION removed successfully"
+          else
+            echo "No existing tag $VERSION to remove or failed request"
           fi
 
-      - name: Create and push new tag
+      - name: Create new tag via API
         run: |
-          git tag $VERSION
-          git push origin $VERSION
+          SHA=$(curl -s -H "Authorization: token ${{ secrets.REPO_ACCESS_TOKEN }}" \
+          "https://api.github.com/repos/${{ github.repository }}/git/ref/heads/${{ github.event.pull_request.base.ref }}" | jq -r .object.sha)
+          
+          curl -X POST -H "Authorization: token ${{ secrets.REPO_ACCESS_TOKEN }}" \
+          -H "Content-Type: application/json" \
+          -d "{\"ref\": \"refs/tags/$VERSION\", \"sha\": \"$SHA\"}" \
+          "https://api.github.com/repos/${{ github.repository }}/git/refs"
 
       - name: Print tag link
         run: |
