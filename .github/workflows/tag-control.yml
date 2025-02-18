@@ -1,0 +1,44 @@
+name: Update Tag on PR Merge
+
+on:
+  pull_request:
+    types:
+      - closed
+
+jobs:
+  update-tag:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Read Swagger version
+        id: swagger_version
+        run: |
+          VERSION=$(grep 'version:' swagger.yaml | awk '{print $2}')
+          echo "Swagger version: $VERSION"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+
+      - name: Remove existing tag (if exists)
+        run: |
+          if git rev-parse refs/tags/$VERSION >/dev/null 2>&1; then
+            echo "Tag $VERSION already exists. Removing..."
+            git push --delete origin $VERSION
+            git tag -d $VERSION
+          fi
+
+      - name: Create and push new tag
+        run: |
+          git tag $VERSION
+          git push origin $VERSION
+
+      - name: Print tag link
+        run: |
+          echo "Tag created: https://github.com/${{ github.repository }}/releases/tag/$VERSION"
