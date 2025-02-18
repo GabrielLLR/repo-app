@@ -33,7 +33,7 @@ jobs:
 
       - name: Authenticate with GitHub
         run: |
-          git remote set-url origin https://x-access-token:${{ secrets.REPO_ACCESS_TOKEN }}@github.com/${{ github.repository }}.git
+          git remote set-url origin https://${{ secrets.REPO_ACCESS_TOKEN }}@github.com/${{ github.repository }}.git
 
       - name: Remove existing tag (if exists)
         run: |
