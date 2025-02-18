@@ -26,15 +26,6 @@ jobs:
           echo "Swagger version: $VERSION"
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-      - name: Configure Git
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-
-      - name: Authenticate with GitHub
-        run: |
-          git remote set-url origin https://${{ secrets.REPO_ACCESS_TOKEN }}@github.com/${{ github.repository }}.git
-
       - name: Remove existing tag (if exists)
         run: |
           if git rev-parse refs/tags/$VERSION >/dev/null 2>&1; then
