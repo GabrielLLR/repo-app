@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Read Swagger version and title
         id: swagger_info
@@ -27,6 +27,7 @@ jobs:
       - name: Trigger remote workflow
         run: |
           curl -X POST -H "Accept: application/vnd.github.v3+json" \
-          -H "Authorization: token ${{ secrets.REPO_ACCESS_TOKEN }}" \
-          -d "{\"event_type\": \"update-tag\", \"client_payload\": {\"repository\": \"${{ github.repository }}\", \"branch\": \"${{ github.event.pull_request.base.ref }}\"}}" \
-          "https://api.github.com/repos/GabrielLLR/repo-ci-cd/actions/workflows/tag-control.yml/dispatches"
+          -H "Authorization: Bearer ${{ secrets.REPO_ACCESS_TOKEN }}" \
+          -H "Content-Type: application/json" \
+          -d "{\"ref\": \"main\", \"inputs\": {\"repository\": \"${{ github.repository }}\", \"branch\": \"${{ github.event.pull_request.base.ref }}\", \"version\": \"$VERSION\", \"title\": \"$TITLE\"}}" \
+          "https://api.github.com/repos/GabrielLLR/repo-ci-cd/actions/workflows/update-tag.yml/dispatches"
