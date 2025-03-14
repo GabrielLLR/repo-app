@@ -207,7 +207,7 @@ paths:
         - Recurring Consents
       summary: Cria um consentimento para transações de pagamentos.
       operationId: automaticPaymentsPostRecurringConsents
-      description: Método para criação de consentimento de longa duração. Retorna um `recurringConsentId` no status AWAITING_AUTHORISATION.
+      description: Método para criação de consentimento de longa duração. Retorna um `recurringConsentId` no status AWAITING_AUTHORISATION.d asdasdasdasdsadsa
       parameters:
         - $ref: '#/components/parameters/Authorization'
         - $ref: '#/components/parameters/xCustomerUserAgent'
